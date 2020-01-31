@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- En el rootApplicationContext se van a configurar los componentes de 
+	la capa de negocio y la capa de datos. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<context:component-scan base-package="net.spring.app.service" />
+	<!-- al arrancar nuestra aplicacion spring va a scanear todas las clases 
+		que esten en este paquete y al encontrar las clases con la anotacion service 
+		va a crear una nueva instancia -->
+
+	<jpa:repositories base-package="net.spring.app.repository" />
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/SistemaVotacion?useSSL=false" />
+		<property name="username" value="root" />
+		<property name="password" value="maxwell1865" />
+	</bean>
+	
+	<bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="generateDdl" value="false" /> <!-- Esta propiedad sirve para indicar si queremos que se ejecute .sql para generar nuestras tablas automaticamente-->
+		<property name="showSql" value="true"></property> <!-- Indicamos si queremos ver en la consola las sentencias sql -->
+		<property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect" /> <!-- Indica el tipo de base de datos -->
+	</bean>
+	
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> <!-- Permite gestionar las entidades en las BD, persistir la info -->
+		<property name="packagesToScan" value="net.spring.app.model" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"> <!-- soporte de transacciones -->
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+</beans>
